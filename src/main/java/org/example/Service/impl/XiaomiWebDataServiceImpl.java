@@ -24,9 +24,9 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         int i = 0;
         int dataNum = 0, total = 10;
         while (dataNum < total) {
-            Connection connect = Jsoup.connect(XiaomiConnectParameter.FRONT_PARA +
+            Connection connect = Jsoup.connect(XiaomiConnectParameter.MIUI_FRONT_PARA +
                     afterParameter +
-                    XiaomiConnectParameter.BACK_PARA);
+                    XiaomiConnectParameter.MIUI_BACK_PARA);
 
             for (String key : object.keySet()) {
                 connect.data(key, object.get(key).toString());

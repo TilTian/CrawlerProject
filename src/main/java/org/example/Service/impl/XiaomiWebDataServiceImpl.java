@@ -18,10 +18,9 @@ import java.io.IOException;
 public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
 
     @Override
-    public CommonResult<?> getXiaomiData() throws IOException {
+    public CommonResult<?> getMIUIData() throws IOException {
         JSONObject object = JSONObject.parseObject(DataFormat.JSON_FORMAT);
         String afterParameter = "1695103580826";
-        int i = 0;
         int dataNum = 0, total = 10;
         while (dataNum < total) {
             Connection connect = Jsoup.connect(XiaomiConnectParameter.MIUI_FRONT_PARA +

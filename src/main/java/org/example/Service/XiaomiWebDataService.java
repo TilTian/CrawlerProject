@@ -8,5 +8,5 @@ import java.io.IOException;
 
 public interface XiaomiWebDataService {
 
-    public CommonResult<?> getXiaomiData() throws IOException;
+    public CommonResult<?> getMIUIData() throws IOException;
 }

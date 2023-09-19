@@ -21,7 +21,7 @@ public class XiaomiWebController {
 
     @GetMapping("getXiaomiData")
     public CommonResult<?> getData() throws IOException {
-        return CommonResult.success(xiaomiWebDataService.getXiaomiData());
+        return CommonResult.success(xiaomiWebDataService.getMIUIData());
     }
 
     @GetMapping("writeExcel")

@@ -82,7 +82,8 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             dataEntity.setUserName(authorObject.getString("name"));
             JSONObject levelInfoObject = JSONObject.parseObject(authorObject.get("userGrowLevelInfo").toString());
             dataEntity.setLevel(levelInfoObject.getInteger("level"));
-            dataEntity.setTitle(levelInfoObject.getString("title"));
+            dataEntity.setUserTitle(levelInfoObject.getString("title"));
+            dataEntity.setTextTitle(dataObject.getString("title"));
             dataEntity.setSummary(dataObject.getString("summary"));
             JSONObject boardObject = JSONArray.parseArray(dataObject.get("boards").toString()).getJSONObject(0);
             dataEntity.setBoardId(boardObject.getString("boardId"));
@@ -145,7 +146,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             for (int j = 0; j < dataList.size(); j++) {
                 XSSFRow sheetRow = sheet.createRow(rowNum++);
                 XiaomiDataEntity dataEntity = dataList.get(j);
-                for (int k = 0; k < 11; k++) {
+                for (int k = 0; k < 12; k++) {
                     switch (k) {
                         case 0 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getUserId());
@@ -160,34 +161,38 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                             break;
                         }
                         case 3 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getTitle());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getUserTitle());
                             break;
                         }
                         case 4 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getSummary());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getTextTitle());
                             break;
                         }
                         case 5 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getBoardId());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getSummary());
                             break;
                         }
                         case 6 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getBoardName());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getBoardId());
                             break;
                         }
                         case 7 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getUrl());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getBoardName());
                             break;
                         }
                         case 8 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getIpRegion());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getUrl());
                             break;
                         }
                         case 9 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getLikeCnt());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getIpRegion());
                             break;
                         }
                         case 10 :{
+                            sheetRow.createCell(k).setCellValue(dataEntity.getLikeCnt());
+                            break;
+                        }
+                        case 11 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getCommentCnt());
                             break;
                         }

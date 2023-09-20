@@ -11,7 +11,9 @@ public class XiaomiDataEntity {
 
     private int Level;
 
-    private String Title;
+    private String UserTitle;
+
+    private String TextTitle;
 
     private String Summary;
 

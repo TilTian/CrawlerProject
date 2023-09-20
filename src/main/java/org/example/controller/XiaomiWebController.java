@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/web/data")
+@RequestMapping("/web/data/xiaomi")
 public class XiaomiWebController {
 
     @Resource
@@ -23,13 +23,6 @@ public class XiaomiWebController {
     public CommonResult<?> getData() throws IOException {
         return CommonResult.success(xiaomiWebDataService.getMIUIData());
     }
-
-    @GetMapping("writeExcel")
-    public CommonResult<?> writeExcel() {
-        return null;
-    }
-
-
 
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;

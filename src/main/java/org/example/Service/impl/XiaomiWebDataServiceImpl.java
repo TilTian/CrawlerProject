@@ -3,7 +3,6 @@ package org.example.Service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
@@ -73,7 +72,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
 
     }
 
-    public List<XiaomiDataEntity> dataETL(JSONArray dataArray) {
+    private List<XiaomiDataEntity> dataETL(JSONArray dataArray) {
         List<XiaomiDataEntity> resultData = new ArrayList<>();
         for (int i = 0; i < dataArray.size(); i++) {
             XiaomiDataEntity dataEntity = new XiaomiDataEntity();//临时实体
@@ -97,7 +96,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         return resultData;
     }
 
-    public void createExcelIfNotExists(String filePath) throws IOException {
+    private void createExcelIfNotExists(String filePath) throws IOException {
         File file = new File(filePath);
         if (!file.exists()) {
             file.createNewFile();
@@ -122,7 +121,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         }
     }
 
-    public XSSFCellStyle setHeadCellStyle(XSSFWorkbook workbook) {
+    private XSSFCellStyle setHeadCellStyle(XSSFWorkbook workbook) {
         XSSFCellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setBorderBottom(BorderStyle.THIN);
@@ -136,7 +135,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
     }
 
 
-    public void writeMIUIExcel(List<XiaomiDataEntity> dataList, String filePath) throws IOException, InvalidFormatException, InterruptedException {
+    private void writeMIUIExcel(List<XiaomiDataEntity> dataList, String filePath) throws IOException, InvalidFormatException, InterruptedException {
         File file = new File(filePath);
         if(file.exists()) {
             XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));

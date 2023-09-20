@@ -2,8 +2,6 @@ package org.example.Entity;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class XiaomiDataEntity {
 
@@ -15,7 +13,7 @@ public class XiaomiDataEntity {
 
     private String Title;
 
-    private String TextContent;
+    private String Summary;
 
     private String BoardId;
 

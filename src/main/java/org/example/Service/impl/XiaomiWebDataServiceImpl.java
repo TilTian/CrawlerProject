@@ -83,7 +83,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             JSONObject levelInfoObject = JSONObject.parseObject(authorObject.get("userGrowLevelInfo").toString());
             dataEntity.setLevel(levelInfoObject.getInteger("level"));
             dataEntity.setTitle(levelInfoObject.getString("title"));
-            dataEntity.setTextContent(dataObject.getString("textContent"));
+            dataEntity.setSummary(dataObject.getString("summary"));
             JSONObject boardObject = JSONArray.parseArray(dataObject.get("boards").toString()).getJSONObject(0);
             dataEntity.setBoardId(boardObject.getString("boardId"));
             dataEntity.setBoardName(boardObject.getString("boardName"));
@@ -164,7 +164,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                             break;
                         }
                         case 4 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getTextContent());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getSummary());
                             break;
                         }
                         case 5 :{

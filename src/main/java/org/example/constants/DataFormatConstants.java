@@ -6,4 +6,5 @@ public class DataFormatConstants {
             "\"offset\": 15,\n" + //页数
             "\"platform\": \"desktop\",\n" +
             "\"sort_by\": \"default\"}";
+    public final static int LIMIT_Text_Content_LENTH = 120;
 }

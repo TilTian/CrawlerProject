@@ -199,9 +199,11 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                         }
                         case 12 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getPublishDate());
+                            break;
                         }
                         case 13 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getCollectTime());
+                            break;
                         }
                     }
                 }

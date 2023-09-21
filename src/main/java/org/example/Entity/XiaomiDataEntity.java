@@ -28,4 +28,8 @@ public class XiaomiDataEntity {
     private int LikeCnt;
 
     private int CommentCnt;
+
+    private String PublishDate;
+
+    private String CollectTime;
 }

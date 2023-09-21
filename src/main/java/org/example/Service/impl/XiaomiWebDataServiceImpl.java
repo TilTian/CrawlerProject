@@ -8,6 +8,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.example.Entity.XiaomiDataEntity;
 import org.example.Service.XiaomiWebDataService;
+import org.example.Utils.DateUtils;
+import org.example.Utils.GetHeaderUtils;
 import org.example.constants.*;
 import org.example.grmsapi.CommonResult;
 import org.jsoup.Connection;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -27,7 +30,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         //依靠获取的新的afterParameter来循环请求
         String afterParameter = "";
         //起始值数据量为0，总数为第一次请求获取到的10
-        int dataNum = 0, total = 50;//测试total值为50
+        int dataNum = 0, total = 10;//测试total值为50
         while (dataNum < total) {
             Connection connect = Jsoup.connect(XiaomiConnectParameter.MIUI_FRONT_PARA +
                     afterParameter +
@@ -49,13 +52,14 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             JSONObject entity = JSONObject.parseObject(responseJson.get("entity").toString());
             JSONObject jsonObject = JSONObject.parseObject(entity.toString());
 //            测试时关闭total赋值
-//            while (total == 10) {
-//                total = Integer.valueOf(jsonObject.get("total").toString());
-//            }
+            while (total == 10) {
+                total = Integer.valueOf(jsonObject.get("total").toString());
+            }
             afterParameter = jsonObject.get("after").toString();
             JSONArray dataArray = JSONArray.parseArray(jsonObject.get("records").toString());
             dataNum += dataArray.size();
-            List<XiaomiDataEntity> resultData = dataETL(dataArray);
+            String collectTime = DateUtils.timeStamp2Date(new Date().getTime(),"");
+            List<XiaomiDataEntity> resultData = dataETL(dataArray,collectTime);
 
             createExcelIfNotExists(DataBasePathConstants.MIUI_PATH);
             try {
@@ -68,7 +72,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
 
     }
 
-    private List<XiaomiDataEntity> dataETL(JSONArray dataArray) {
+    private List<XiaomiDataEntity> dataETL(JSONArray dataArray, String collectTime) {
         List<XiaomiDataEntity> resultData = new ArrayList<>();
         for (int i = 0; i < dataArray.size(); i++) {
             XiaomiDataEntity dataEntity = new XiaomiDataEntity();//临时实体
@@ -88,6 +92,8 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             dataEntity.setIpRegion(dataObject.getString("ipRegion"));
             dataEntity.setLikeCnt(dataObject.getInteger("likeCnt"));
             dataEntity.setCommentCnt(dataObject.getInteger("commentCnt"));
+            dataEntity.setPublishDate(DateUtils.timeStamp2Date(dataObject.getLong("createTime"),""));
+            dataEntity.setCollectTime(collectTime);
             resultData.add(dataEntity);
         }
         return resultData;
@@ -97,7 +103,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         File file = new File(filePath);
         if (!file.exists()) {
             file.createNewFile();
-            List<String> headList = Arrays.asList(HeaderConstants.MIUI_HEADER.split(","));
+            List<String> headList = GetHeaderUtils.getHeader();
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet(XiaomiSheetNameConstants.MIUI_SHEET_NAME);
             for (int i = 0; i < headList.size(); i++) {
@@ -142,7 +148,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             for (int j = 0; j < dataList.size(); j++) {
                 XSSFRow sheetRow = sheet.createRow(rowNum++);
                 XiaomiDataEntity dataEntity = dataList.get(j);
-                for (int k = 0; k < 12; k++) {
+                for (int k = 0; k < GetHeaderUtils.getHeader().size(); k++) {
                     switch (k) {
                         case 0 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getUserId());
@@ -191,6 +197,12 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                         case 11 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getCommentCnt());
                             break;
+                        }
+                        case 12 :{
+                            sheetRow.createCell(k).setCellValue(dataEntity.getPublishDate());
+                        }
+                        case 13 :{
+                            sheetRow.createCell(k).setCellValue(dataEntity.getCollectTime());
                         }
                     }
                 }

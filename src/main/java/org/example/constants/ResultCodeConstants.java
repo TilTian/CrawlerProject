@@ -1,6 +1,6 @@
 package org.example.constants;
 
-public class ResultConstants {
+public class ResultCodeConstants {
 
     public final static int CSDN_SUCCESS_CODE = 521;
 

@@ -87,6 +87,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             JSONObject boardObject = JSONArray.parseArray(dataObject.get("boards").toString()).getJSONObject(0);
             dataEntity.setBoardId(boardObject.getString("boardId"));
             dataEntity.setBoardName(boardObject.getString("boardName"));
+            dataEntity.setPostId(dataObject.getString("id"));
             dataEntity.setUrl(PostUrlParameter.XIAOMI_POST_FONT_PARA + "&postId=" + dataObject.getString("id") + "&fromBoardId=" + dataEntity.getBoardId());
             dataEntity.setIpRegion(dataObject.getString("ipRegion"));
             dataEntity.setLikeCnt(dataObject.getInteger("likeCnt"));
@@ -182,26 +183,30 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                             break;
                         }
                         case 8 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getUrl());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getPostId());
                             break;
                         }
                         case 9 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getIpRegion());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getUrl());
                             break;
                         }
                         case 10 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getLikeCnt());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getIpRegion());
                             break;
                         }
                         case 11 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getCommentCnt());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getLikeCnt());
                             break;
                         }
                         case 12 :{
-                            sheetRow.createCell(k).setCellValue(dataEntity.getPublishDate());
+                            sheetRow.createCell(k).setCellValue(dataEntity.getCommentCnt());
                             break;
                         }
                         case 13 :{
+                            sheetRow.createCell(k).setCellValue(dataEntity.getPublishDate());
+                            break;
+                        }
+                        case 14 :{
                             sheetRow.createCell(k).setCellValue(dataEntity.getCollectTime());
                             break;
                         }

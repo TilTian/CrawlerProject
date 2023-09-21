@@ -21,6 +21,8 @@ public class XiaomiDataEntity {
 
     private String BoardName;
 
+    private String PostId;
+
     private String Url;
 
     private String IpRegion;

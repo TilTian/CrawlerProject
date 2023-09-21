@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,9 +31,9 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         //起始值数据量为0，总数为第一次请求获取到的10
         int dataNum = 0, total = 10;//测试total值为50
         while (dataNum < total) {
-            Connection connect = Jsoup.connect(XiaomiConnectParameter.MIUI_FRONT_PARA +
+            Connection connect = Jsoup.connect(XiaomiRequestParameter.MIUI_FRONT_PARA +
                     afterParameter +
-                    XiaomiConnectParameter.MIUI_BACK_PARA);
+                    XiaomiRequestParameter.MIUI_BACK_PARA);
 
             // 发起请求并接受响应
             Connection connection = connect

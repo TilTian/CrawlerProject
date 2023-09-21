@@ -21,13 +21,13 @@ public class XiaomiWebController {
 
     @GetMapping("getXiaomiData")
     public CommonResult<?> getData() throws IOException {
-        return CommonResult.success(xiaomiWebDataService.getMIUIData());
+        return xiaomiWebDataService.getMIUIData();
     }
 
     @Resource
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @GetMapping(value = "send")
+    @GetMapping("send")
     public void sendMsg() {
 
         String msg = "12345";

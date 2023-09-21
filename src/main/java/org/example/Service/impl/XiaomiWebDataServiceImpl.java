@@ -24,18 +24,14 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
 
     @Override
     public CommonResult<?> getMIUIData() throws IOException {
-        JSONObject object = JSONObject.parseObject(DataFormatConstants.JSON_FORMAT);
+        //依靠获取的新的afterParameter来循环请求
         String afterParameter = "";
         //起始值数据量为0，总数为第一次请求获取到的10
-        int dataNum = 0, total = 10;//测试total值为50
+        int dataNum = 0, total = 50;//测试total值为50
         while (dataNum < total) {
             Connection connect = Jsoup.connect(XiaomiConnectParameter.MIUI_FRONT_PARA +
                     afterParameter +
                     XiaomiConnectParameter.MIUI_BACK_PARA);
-
-            for (String key : object.keySet()) {
-                connect.data(key, object.get(key).toString());
-            }
 
             // 发起请求并接受响应
             Connection connection = connect
@@ -53,9 +49,9 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             JSONObject entity = JSONObject.parseObject(responseJson.get("entity").toString());
             JSONObject jsonObject = JSONObject.parseObject(entity.toString());
 //            测试时关闭total赋值
-            while (total == 10) {
-                total = Integer.valueOf(jsonObject.get("total").toString());
-            }
+//            while (total == 10) {
+//                total = Integer.valueOf(jsonObject.get("total").toString());
+//            }
             afterParameter = jsonObject.get("after").toString();
             JSONArray dataArray = JSONArray.parseArray(jsonObject.get("records").toString());
             dataNum += dataArray.size();

@@ -1,15 +1,21 @@
 package org.example.Entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class XiaomiDataEntity {
 
     private String UserId;
 
     private String UserName;
 
-    private int Level;
+    private int UserLevel;
 
     private String UserTitle;
 

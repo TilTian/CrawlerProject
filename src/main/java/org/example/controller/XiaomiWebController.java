@@ -1,8 +1,10 @@
 package org.example.controller;
 
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.example.Service.XiaomiCommentDataService;
 import org.example.Service.XiaomiWebDataService;
-import org.example.Service.impl.XiaomiWebDataServiceImpl;
+import org.example.constants.DataBasePathConstants;
 import org.example.grmsapi.CommonResult;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +19,19 @@ import java.io.IOException;
 public class XiaomiWebController {
 
     @Resource
-    private XiaomiWebDataService xiaomiWebDataService = new XiaomiWebDataServiceImpl();
+    private XiaomiWebDataService xiaomiWebDataService;
+
+    @Resource
+    private XiaomiCommentDataService xiaomiCommentDataService;
 
     @GetMapping("getXiaomiData")
-    public CommonResult<?> getData() throws IOException {
+    public CommonResult<?> getData() throws Exception {
         return xiaomiWebDataService.getMIUIData();
+    }
+
+    @GetMapping("getXiaomiCommentData")
+    public CommonResult<?> getCommentData() throws Exception {
+        return xiaomiCommentDataService.getXiaomiMainCommentData(DataBasePathConstants.MIUI_PATH);
     }
 
     @Resource

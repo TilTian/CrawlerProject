@@ -53,8 +53,8 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
             ExcelUtils.createExcelIfNotExists(DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH);
             ExcelUtils.setEntityHeader(DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH, XiaomiSheetNameConstants.XIAOMI_MAIN_COMMENT_SHEET_NAME, GetHeaderUtils.getXiaomiMainCommentDataHeader());
         }
-
-        while (rowIndex <= sheet.getLastRowNum()) {
+        int lastRowNum = sheet.getLastRowNum();
+        while (rowIndex <= lastRowNum) {
             String afterPara;
             int commentCnt = 0;//记录主贴数量
             XSSFRow row = sheet.getRow(rowIndex);

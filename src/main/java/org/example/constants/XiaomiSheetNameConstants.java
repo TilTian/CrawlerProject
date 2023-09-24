@@ -4,4 +4,6 @@ public class XiaomiSheetNameConstants {
     public final static String MIUI_SHEET_NAME = "MIUI_DATA";
 
     public final static String XIAOMI_MAIN_COMMENT_SHEET_NAME = "XIAOMI_COMMENT";
+
+    public final static String XIAOMI_FOLLOW_COMMENT_SHEET_NAME = "XIAOMI_FOLLOW_COMMENT";
 }

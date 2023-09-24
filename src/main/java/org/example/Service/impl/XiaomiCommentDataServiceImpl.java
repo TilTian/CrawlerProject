@@ -12,10 +12,7 @@ import org.example.Utils.DateUtils;
 import org.example.Utils.ExcelUtils;
 import org.example.Utils.GetHeaderUtils;
 import org.example.Utils.StringUtils;
-import org.example.constants.DataBasePathConstants;
-import org.example.constants.UserAgentConstants;
-import org.example.constants.XiaomiRequestParameter;
-import org.example.constants.XiaomiSheetNameConstants;
+import org.example.constants.*;
 import org.example.grmsapi.CommonResult;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -56,11 +53,12 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
         int lastRowNum = sheet.getLastRowNum();
         while (rowIndex <= lastRowNum) {
             String afterPara;
-            int commentCnt = 0;//记录以及评论数量
+            int commentCnt = 0;//记录一级评论数量
             XSSFRow row = sheet.getRow(rowIndex++);
             //获取总评论数量，包括一级评论及下级评论数量
             double totalCommentCnt = (row.getCell(GetHeaderUtils.getXiaomiDataHeader().indexOf("CommentCnt")).getNumericCellValue());
             if (totalCommentCnt != 0) {
+                //小米社区主贴评论请求地址为前参 + postId + *after（起始index） + 后参     (+ fromBoardId)
                 String postId = row.getCell(GetHeaderUtils.getXiaomiDataHeader().indexOf("PostId")).getStringCellValue();
                 boolean isLastPage = false;
                 while (!isLastPage) {
@@ -72,17 +70,24 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
                             .userAgent(UserAgentConstants.USER_AGENT).execute();
                     //解析响应体
                     JSONObject responseJson = JSONObject.parseObject(response.body());
-                    if (Integer.valueOf(responseJson.get("code").toString()) != 200) {
-                        return CommonResult.failed("API调用失败，" + responseJson.get("message"));
+                    String responseCode = responseJson.get("code").toString();
+                    //异常处理
+                    if (Integer.valueOf(responseCode) != 200) {
+                        String responseMessage = responseJson.getString("message");
+                        if (responseMessage.equals(ResultMessageConstants.XIAOMI_COMMENT_NOT_EXISTS)) {
+                            continue;
+                        }
+                        return CommonResult.failed("API调用失败，" + "错误代码为:" + responseCode
+                                + "。"+ responseMessage);
                     }
                     JSONObject entityObject = JSONObject.parseObject(responseJson.getJSONObject("entity").toString());
                     JSONArray records = JSONArray.parseArray(entityObject.getJSONArray("records").toString());
                     if (records.size() == 0) {
-                        break;
+                        break;//请求到空值，评论爬取完毕
                     }
                     List<XiaomiMainCommentDataEntity> resultData = XiaomiCommentDataEtl(records, collectTime);
                     commentCnt += resultData.size();
-                    writeXiaomiMainCommentExcel(resultData, DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH);
+                    writeXiaomiMainCommentExcel(resultData, resultFile);
                     isLastPage = resultData.size() < 10;//请求到最后一页跳出循环
                 }
             }
@@ -155,10 +160,9 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
         return new ArrayList<>();
     }
 
-    private void writeXiaomiMainCommentExcel(List<XiaomiMainCommentDataEntity> dataList, String filePath) throws IOException {
-        File file = new File(filePath);
-        if (file.exists()) {
-            XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));
+    private void writeXiaomiMainCommentExcel(List<XiaomiMainCommentDataEntity> dataList, File fileName) throws IOException {
+        if (fileName.exists()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(fileName));
             XSSFSheet sheet = workbook.getSheet(XiaomiSheetNameConstants.XIAOMI_MAIN_COMMENT_SHEET_NAME);
             int rowNum = sheet.getLastRowNum() + 1;
 
@@ -218,7 +222,7 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
                     }
                 }
             }
-            FileOutputStream outputStream = new FileOutputStream(file);
+            FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();

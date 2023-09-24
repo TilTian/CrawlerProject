@@ -1,8 +1,8 @@
 package org.example.controller;
 
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.example.Service.XiaomiCommentDataService;
+import org.example.Service.XiaomiFollowCommentDataService;
 import org.example.Service.XiaomiWebDataService;
 import org.example.constants.DataBasePathConstants;
 import org.example.grmsapi.CommonResult;
@@ -24,6 +24,9 @@ public class XiaomiWebController {
     @Resource
     private XiaomiCommentDataService xiaomiCommentDataService;
 
+    @Resource
+    private XiaomiFollowCommentDataService xiaomiFollowCommentDataService;
+
     @GetMapping("getXiaomiData")
     public CommonResult<?> getData() throws Exception {
         return xiaomiWebDataService.getMIUIData();
@@ -32,6 +35,11 @@ public class XiaomiWebController {
     @GetMapping("getXiaomiCommentData")
     public CommonResult<?> getCommentData() throws Exception {
         return xiaomiCommentDataService.getXiaomiMainCommentData(DataBasePathConstants.MIUI_PATH);
+    }
+
+    @GetMapping("getXiaomiFollowCommentData")
+    public CommonResult<?> getFollowCommentData() throws IOException, InterruptedException {
+        return xiaomiFollowCommentDataService.getXiaomiFollowCommentData(DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH);
     }
 
     @Resource

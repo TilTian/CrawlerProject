@@ -31,7 +31,8 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
         //起始值数据量为0，总数为第一次请求获取到的10
         int dataNum = 0, total = 10;//测试total值为50
         String collectTime = DateUtils.timeStamp2Date(new Date().getTime(),"");
-        if (!new File(DataBasePathConstants.MIUI_PATH).exists()) {
+        File resultFile = new File(DataBasePathConstants.MIUI_PATH);
+        if (!resultFile.exists()) {
             ExcelUtils.createExcelIfNotExists(DataBasePathConstants.MIUI_PATH);
             ExcelUtils.setEntityHeader(DataBasePathConstants.MIUI_PATH, XiaomiSheetNameConstants.MIUI_SHEET_NAME, GetHeaderUtils.getXiaomiDataHeader());
         }
@@ -63,7 +64,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
             dataNum += dataArray.size();
             List<XiaomiDataEntity> resultData = XiaomiWebDataEtl(dataArray,collectTime);
             try {
-                writeMIUIExcel(resultData, DataBasePathConstants.MIUI_PATH);
+                writeMIUIExcel(resultData, resultFile);
             } catch (InvalidFormatException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -104,10 +105,9 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
     }
 
 
-    private void writeMIUIExcel(List<XiaomiDataEntity> dataList, String filePath) throws IOException, InvalidFormatException, InterruptedException {
-        File file = new File(filePath);
-        if(file.exists()) {
-            XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file));
+    private void writeMIUIExcel(List<XiaomiDataEntity> dataList, File fileName) throws IOException, InvalidFormatException, InterruptedException {
+        if(fileName.exists()) {
+            XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(fileName));
             XSSFSheet sheet = workbook.getSheet(XiaomiSheetNameConstants.MIUI_SHEET_NAME);
             int rowNum = sheet.getLastRowNum() + 1;
 
@@ -179,7 +179,7 @@ public class XiaomiWebDataServiceImpl implements XiaomiWebDataService {
                     }
                 }
             }
-            FileOutputStream outputStream = new FileOutputStream(file);
+            FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
             outputStream.flush();
             outputStream.close();

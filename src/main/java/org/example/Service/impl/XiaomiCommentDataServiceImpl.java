@@ -2,7 +2,6 @@ package org.example.Service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,6 +11,7 @@ import org.example.Service.XiaomiCommentDataService;
 import org.example.Utils.DateUtils;
 import org.example.Utils.ExcelUtils;
 import org.example.Utils.GetHeaderUtils;
+import org.example.Utils.StringUtils;
 import org.example.constants.DataBasePathConstants;
 import org.example.constants.UserAgentConstants;
 import org.example.constants.XiaomiRequestParameter;
@@ -34,7 +34,7 @@ import java.util.List;
 public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
     @Override
     public CommonResult<?> getXiaomiMainCommentData(String sourceFilePath) throws IOException, InterruptedException {
-        if (sourceFilePath == "" || sourceFilePath == null) {
+        if (StringUtils.isEmpty(sourceFilePath)) {
             sourceFilePath = DataBasePathConstants.MIUI_PATH;
         }
         File file = new File(sourceFilePath);
@@ -56,37 +56,39 @@ public class XiaomiCommentDataServiceImpl implements XiaomiCommentDataService {
         int lastRowNum = sheet.getLastRowNum();
         while (rowIndex <= lastRowNum) {
             String afterPara;
-            int commentCnt = 0;//记录主贴数量
-            XSSFRow row = sheet.getRow(rowIndex);
-            String postId = row.getCell(GetHeaderUtils.getXiaomiDataHeader().indexOf("PostId")).getStringCellValue();
-            boolean isLastPage = false;
-            while (!isLastPage) {
-                afterPara = commentCnt == 0 ? "" : String.valueOf(commentCnt += 10);
-                //建立连接
-                Connection connect = Jsoup.connect(XiaomiRequestParameter.COMMENT_FONT_PARA + "&postId=" + postId +
-                        "&after=" + afterPara + XiaomiRequestParameter.COMMENT_BACK_PARA);
-                Connection.Response response = connect.ignoreContentType(true)
-                        .userAgent(UserAgentConstants.USER_AGENT).execute();
-                //解析响应体
-                JSONObject responseJson = JSONObject.parseObject(response.body());
-                if (Integer.valueOf(responseJson.get("code").toString()) != 200) {
-                    return CommonResult.failed("API调用失败，" + responseJson.get("message"));
+            int commentCnt = 0;//记录以及评论数量
+            XSSFRow row = sheet.getRow(rowIndex++);
+            //获取总评论数量，包括一级评论及下级评论数量
+            double totalCommentCnt = (row.getCell(GetHeaderUtils.getXiaomiDataHeader().indexOf("CommentCnt")).getNumericCellValue());
+            if (totalCommentCnt != 0) {
+                String postId = row.getCell(GetHeaderUtils.getXiaomiDataHeader().indexOf("PostId")).getStringCellValue();
+                boolean isLastPage = false;
+                while (!isLastPage) {
+                    afterPara = commentCnt == 0 ? "" : String.valueOf(commentCnt += 10);
+                    //建立连接
+                    Connection connect = Jsoup.connect(XiaomiRequestParameter.COMMENT_FONT_PARA + "&postId=" + postId +
+                            "&after=" + afterPara + XiaomiRequestParameter.COMMENT_BACK_PARA);
+                    Connection.Response response = connect.ignoreContentType(true)
+                            .userAgent(UserAgentConstants.USER_AGENT).execute();
+                    //解析响应体
+                    JSONObject responseJson = JSONObject.parseObject(response.body());
+                    if (Integer.valueOf(responseJson.get("code").toString()) != 200) {
+                        return CommonResult.failed("API调用失败，" + responseJson.get("message"));
+                    }
+                    JSONObject entityObject = JSONObject.parseObject(responseJson.getJSONObject("entity").toString());
+                    JSONArray records = JSONArray.parseArray(entityObject.getJSONArray("records").toString());
+                    if (records.size() == 0) {
+                        break;
+                    }
+                    List<XiaomiMainCommentDataEntity> resultData = XiaomiCommentDataEtl(records, collectTime);
+                    commentCnt += resultData.size();
+                    writeXiaomiMainCommentExcel(resultData, DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH);
+                    isLastPage = resultData.size() < 10;//请求到最后一页跳出循环
                 }
-                JSONObject entityObject = JSONObject.parseObject(responseJson.getJSONObject("entity").toString());
-                JSONArray records = JSONArray.parseArray(entityObject.getJSONArray("records").toString());
-                int recordSize = records.size();
-                if (recordSize == 0) {
-                    break;
-                }
-                commentCnt+= recordSize;
-                List<XiaomiMainCommentDataEntity> resultData = XiaomiCommentDataEtl(records, collectTime);
-                writeXiaomiMainCommentExcel(resultData,DataBasePathConstants.XIAOMI_MAIN_COMMENT_PATH);
-                isLastPage = commentCnt % 10 != 0;//请求到最后一页跳出循环
             }
-            rowIndex++;
         }
 
-        return null;
+        return CommonResult.success("Api调用成功！");
     }
 
     @Override
